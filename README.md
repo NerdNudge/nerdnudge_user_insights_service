@@ -1,2 +1,2 @@
-# nerdnudge_user_insights_service
-Project to handle the API requests for getting the user insights.
+# nerdnudge_user_activity_service
+Nerd Nudge Service that handles the user activities.
