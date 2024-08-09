@@ -1,10 +1,12 @@
-package com.neurospark.nerdnudge.useractivity.utils;
+package com.neurospark.nerdnudge.userinsights.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
@@ -60,12 +62,26 @@ public class Commons {
         return newArray;
     }
 
-    public String getDaystamp() {
+    public static String getDaystamp() {
         LocalDate date = LocalDate.now();
         int dayOfYear = date.getDayOfYear();
         int year = date.getYear() % 100;
         String dayOfYearStr = String.format("%03d", dayOfYear);
         String yearStr = String.format("%02d", year);
         return dayOfYearStr + yearStr;
+    }
+
+    public static JsonObject getUserProfileDocument(String userId, NerdPersistClient userProfilesPersist) {
+        JsonObject userData = userProfilesPersist.get(userId);
+        if(userData == null) {
+            userData = new JsonObject();
+            userData.addProperty("registrationDate", Instant.now().getEpochSecond());
+            userData.addProperty("type", "userProfile");
+            userData.addProperty("accountType", "freemium");
+            userData.addProperty("accountStartDate", getDaystamp());
+        }
+
+        System.out.println("user data returned: " + userData);
+        return userData;
     }
 }
