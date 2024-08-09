@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
 
-    private NerdPersistClient userProfilesPersist;
+    public NerdPersistClient userProfilesPersist;
 
     @Autowired
     public void UserInsightsServiceImpl(@Qualifier("userProfilesPersist") NerdPersistClient userProfilesPersist) {
@@ -19,6 +19,6 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
 
     @Override
     public UserHomePageStatsEntity getUserHomePageStats(String id) {
-        return new UserHomePageStatsEntity(Commons.getUserProfileDocument(id, userProfilesPersist));
+        return new UserHomePageStatsEntity(Commons.getUserProfileDocument(id, userProfilesPersist), userProfilesPersist);
     }
 }

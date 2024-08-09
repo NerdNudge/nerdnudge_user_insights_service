@@ -2,6 +2,7 @@ package com.neurospark.nerdnudge.userinsights.dto;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import lombok.Data;
 
@@ -19,16 +20,26 @@ public class UserHomePageStatsEntity {
     private int highestStreak = 0;
     private int quizflexCountToday = 0;
     private int shotsCountToday = 0;
-    private String quoteOfTheDay = "";
-    private int numPeopleUsedNerdNudgeToday = 654;
+    private String quoteOfTheDay = "This is the quote of the day";
+    private String quoteAuthor = "Unknown (with unknown credentials)";
+    private long numPeopleUsedNerdNudgeToday = 654;
 
-
-    public UserHomePageStatsEntity(JsonObject userProfileDocument) {
+    public UserHomePageStatsEntity(JsonObject userProfileDocument, NerdPersistClient userProfilesPersist) {
         updateAccountType(userProfileDocument);
         updateSummaryCounts(userProfileDocument);
         updateDayStatsCounts(userProfileDocument);
         updateStreakCounts(userProfileDocument);
         updateCurrentDayCounts(userProfileDocument);
+        updateQuote(userProfileDocument);
+        updateNumPeopleUsedNerdNudgeToday(userProfilesPersist);
+    }
+
+    private void updateNumPeopleUsedNerdNudgeToday(NerdPersistClient userProfilesPersist) {
+        String currentDay = Commons.getDaystamp();
+        numPeopleUsedNerdNudgeToday = userProfilesPersist.getCounter(currentDay + "_user_counts");
+    }
+
+    private void updateQuote(JsonObject userProfileDocument) {
 
     }
 
