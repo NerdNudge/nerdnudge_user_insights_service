@@ -1,4 +1,4 @@
-package com.neurospark.nerdnudge.userinsights.service;
+package com.neurospark.nerdnudge.userinsights.service.userHomePage;
 
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.UserHomePageStatsEntity;
