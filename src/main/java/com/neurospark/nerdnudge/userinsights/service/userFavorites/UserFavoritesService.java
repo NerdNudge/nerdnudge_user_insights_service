@@ -1,9 +1,9 @@
 package com.neurospark.nerdnudge.userinsights.service.userFavorites;
 
-import com.neurospark.nerdnudge.userinsights.dto.UserRecentFavoritesEntity;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
 public interface UserFavoritesService {
-    public List<UserRecentFavoritesEntity> getRecentFavorites(String userId);
+    public List<JsonObject> getRecentFavorites(String userId);
 }

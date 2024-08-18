@@ -1,5 +1,6 @@
 package com.neurospark.nerdnudge.userinsights.controller;
 
+import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.userinsights.dto.UserRecentFavoritesEntity;
 import com.neurospark.nerdnudge.userinsights.response.ApiResponse;
 import com.neurospark.nerdnudge.userinsights.service.userFavorites.UserFavoritesService;
@@ -20,10 +21,20 @@ public class UserFavoritesController {
     UserFavoritesService userFavoritesService;
 
     @GetMapping("/getUserRecentFavorites/{id}")
-    public ApiResponse<List<UserRecentFavoritesEntity>> getUserRecentFavorites(@PathVariable(value = "id") String userId) {
+    public ApiResponse<List<JsonObject>> getUserRecentFavorites(@PathVariable(value = "id") String userId) {
         long startTime = System.currentTimeMillis();
         System.out.println("User Insights Data in request: " + userId);
-        List<UserRecentFavoritesEntity> userRecentFavoritesEntities = userFavoritesService.getRecentFavorites(userId);
+        List<JsonObject> userRecentFavoritesEntities = userFavoritesService.getRecentFavorites(userId);
+        long endTime = System.currentTimeMillis();
+        return new ApiResponse<>(Constants.SUCCESS, "User recent favorites fetched successfully", userRecentFavoritesEntities, (endTime - startTime));
+    }
+
+    @GetMapping("/getUserFavoriteTopics/{id}")
+    public ApiResponse<List<JsonObject>> getUserFavoriteTopics(@PathVariable(value = "id") String userId) {
+        long startTime = System.currentTimeMillis();
+        System.out.println("User Insights Data in request: " + userId);
+
+
         long endTime = System.currentTimeMillis();
         return new ApiResponse<>(Constants.SUCCESS, "User recent favorites fetched successfully", userRecentFavoritesEntities, (endTime - startTime));
     }

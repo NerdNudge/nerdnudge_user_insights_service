@@ -34,9 +34,9 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
     }
 
     @Override
-    public List<UserRecentFavoritesEntity> getRecentFavorites(String userId) {
+    public List<JsonObject> getRecentFavorites(String userId) {
         JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
-        List<UserRecentFavoritesEntity> result = new ArrayList<>();
+        List<JsonObject> result = new ArrayList<>();
         if(! userData.has("favorites"))
             return result;
 
@@ -46,7 +46,7 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
 
         JsonArray recentArray = favoritesObject.get("recent").getAsJsonArray();
         System.out.println(contentManagerBaseUrl + recentFavoritesUrl);
-        ApiResponse<List<UserRecentFavoritesEntity>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, recentArray.toString(), ApiResponse.class);
+        ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, recentArray.toString(), ApiResponse.class);
 
         return response.getData();
     }
