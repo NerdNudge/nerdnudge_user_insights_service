@@ -1,8 +1,10 @@
 package com.neurospark.nerdnudge.userinsights.service.userFavorites;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
+import com.neurospark.nerdnudge.userinsights.dto.UserFavoriteTopicsEntity;
 import com.neurospark.nerdnudge.userinsights.dto.UserRecentFavoritesEntity;
 import com.neurospark.nerdnudge.userinsights.response.ApiResponse;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
@@ -12,9 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserFavoritesServiceImpl implements UserFavoritesService {
@@ -49,5 +49,41 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
         ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, recentArray.toString(), ApiResponse.class);
 
         return response.getData();
+    }
+
+    @Override
+    public List<UserFavoriteTopicsEntity> getFavoritesTopics(String userId) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        List<UserFavoriteTopicsEntity> result = new ArrayList<>();
+        if(! userData.has("favorites"))
+            return result;
+
+        JsonObject favoritesObject = userData.get("favorites").getAsJsonObject();
+        if(!favoritesObject.has("topicwise"))
+            return result;
+
+        JsonObject topicwiseObject = favoritesObject.get("topicwise").getAsJsonObject();
+        Iterator<Map.Entry<String, JsonElement>> topicsIterator = topicwiseObject.entrySet().iterator();
+        while(topicsIterator.hasNext()) {
+            Map.Entry<String, JsonElement> thisEntry = topicsIterator.next();
+            JsonObject thisTopicObject = thisEntry.getValue().getAsJsonObject();
+
+            UserFavoriteTopicsEntity userFavoriteTopicsEntity = new UserFavoriteTopicsEntity();
+            userFavoriteTopicsEntity.setTopicName(thisEntry.getKey());
+            userFavoriteTopicsEntity.setNumFavoriteSubtopics(thisTopicObject.size());
+
+            Iterator<Map.Entry<String, JsonElement>> subtopicsIterator = thisTopicObject.entrySet().iterator();
+            int totalFavorites = 0;
+            while(subtopicsIterator.hasNext()) {
+                Map.Entry<String, JsonElement> thisSubtopicEntry = subtopicsIterator.next();
+                JsonArray thisSubtopicArray = thisSubtopicEntry.getValue().getAsJsonArray();
+                totalFavorites += thisSubtopicArray.size();
+            }
+
+            userFavoriteTopicsEntity.setFavoritesCount(totalFavorites);
+
+            result.add(userFavoriteTopicsEntity);
+        }
+        return result;
     }
 }

@@ -8,6 +8,8 @@ import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -83,5 +85,14 @@ public class Commons {
 
         System.out.println("user data returned: " + userData);
         return userData;
+    }
+
+    public static long getDaysDifference(long epochTimeInMillis) {
+        LocalDate dateFromEpoch = Instant.ofEpochMilli(epochTimeInMillis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate currentDate = LocalDate.now();
+        return ChronoUnit.DAYS.between(dateFromEpoch, currentDate);
     }
 }

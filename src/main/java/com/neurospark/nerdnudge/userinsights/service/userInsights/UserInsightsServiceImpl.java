@@ -1,11 +1,24 @@
 package com.neurospark.nerdnudge.userinsights.service.userInsights;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
+import com.neurospark.nerdnudge.userinsights.dto.UserTopicsStatsEntity;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @Service
 public class UserInsightsServiceImpl implements UserInsightsService {
@@ -23,5 +36,61 @@ public class UserInsightsServiceImpl implements UserInsightsService {
     @Override
     public JsonObject getUserInsights(String userId) {
         return Commons.getUserProfileDocument(userId, userProfilesPersist);
+    }
+
+    @Override
+    public Map<String, UserTopicsStatsEntity> getUserTopicStats(String userId) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        Map<String, UserTopicsStatsEntity> userTopicsStats = new HashMap<>();
+        if(! userData.has("topicwise"))
+            return userTopicsStats;
+
+        JsonObject topicwiseObject = userData.get("topicwise").getAsJsonObject();
+        if(!topicwiseObject.has("overall"))
+            return userTopicsStats;
+
+        JsonObject overallObject = topicwiseObject.get("overall").getAsJsonObject();
+        Iterator<Map.Entry<String, JsonElement>> topicsIterator = overallObject.entrySet().iterator();
+        while(topicsIterator.hasNext()) {
+            Map.Entry<String, JsonElement> thisEntry = topicsIterator.next();
+            String topic = thisEntry.getKey();
+            JsonObject subtopicObject = thisEntry.getValue().getAsJsonObject();
+            if(! subtopicObject.has("correct"))
+                continue;
+
+            JsonArray correctArray = subtopicObject.get("correct").getAsJsonArray();
+            double userTopicScore = getUserTopicScoreIndicator(correctArray.get(0).getAsInt(), correctArray.get(1).getAsInt());
+            long topicLastTaken = subtopicObject.get("lastTaken").getAsLong();
+            userTopicsStats.put(topic, new UserTopicsStatsEntity(userTopicScore, lastTakenByUser(topicLastTaken)));
+        }
+
+        return userTopicsStats;
+    }
+
+    private double getUserTopicScoreIndicator(int numQuizflexes, int correct) {
+        int maxQuestions = 2400;
+        if (numQuizflexes == 0) {
+            return 0.0;
+        }
+
+        double baseScore = ((double) correct / numQuizflexes) * 100;
+
+        double weight = Math.log1p(numQuizflexes) / Math.log1p(maxQuestions);
+        weight = Math.min(1.0, weight);
+        double finalScore = baseScore * weight;
+        return Math.round(finalScore * 100.0) / 100.0;
+    }
+
+    private String lastTakenByUser(long epoch) {
+        long daysDifference = Commons.getDaysDifference(epoch);
+        if(daysDifference == 0)
+            return "Today";
+
+        if(daysDifference < 30)
+            return (daysDifference + "days ago");
+
+        LocalDateTime dateTime = Instant.ofEpochMilli(epoch).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+        return dateTime.format(formatter);
     }
 }
