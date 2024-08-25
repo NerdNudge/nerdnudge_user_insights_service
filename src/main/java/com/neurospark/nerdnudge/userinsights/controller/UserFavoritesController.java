@@ -1,6 +1,7 @@
 package com.neurospark.nerdnudge.userinsights.controller;
 
 import com.google.gson.JsonObject;
+import com.neurospark.nerdnudge.userinsights.dto.QuotesEntity;
 import com.neurospark.nerdnudge.userinsights.dto.UserFavoriteTopicsEntity;
 import com.neurospark.nerdnudge.userinsights.response.ApiResponse;
 import com.neurospark.nerdnudge.userinsights.service.userFavorites.UserFavoritesService;
@@ -37,5 +38,15 @@ public class UserFavoritesController {
         List<UserFavoriteTopicsEntity> result = userFavoritesService.getFavoritesTopics(userId);
         long endTime = System.currentTimeMillis();
         return new ApiResponse<>(Constants.SUCCESS, "User favorite topics fetched successfully", result, (endTime - startTime));
+    }
+
+    @GetMapping("/getUserFavoriteQuotes/{id}")
+    public ApiResponse<List<QuotesEntity>> getUserFavoriteQuotes(@PathVariable(value = "id") String userId) {
+        long startTime = System.currentTimeMillis();
+        System.out.println("User favorites Quotes in request: " + userId);
+
+        List<QuotesEntity> result = userFavoritesService.getFavoritesQuotes(userId);
+        long endTime = System.currentTimeMillis();
+        return new ApiResponse<>(Constants.SUCCESS, "User favorite quotes fetched successfully", result, (endTime - startTime));
     }
 }

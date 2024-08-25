@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.QuotesEntity;
 import com.neurospark.nerdnudge.userinsights.dto.UserHomePageStatsEntity;
+import com.neurospark.nerdnudge.userinsights.service.quotes.Quotes;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,15 +13,15 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Random;
 
 @Service
 public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
 
     private NerdPersistClient userProfilesPersist;
     private NerdPersistClient configPersist;
-    private QuotesEntity quotesEntity;
-    Random random = new Random();
+
+    @Autowired
+    private Quotes quotesService;
 
     @Autowired
     public void UserInsightsServiceImpl(@Qualifier("userProfilesPersist") NerdPersistClient userProfilesPersist,
@@ -53,73 +54,19 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
     }
 
     private void updateQuote(UserHomePageStatsEntity userHomePageStatsEntity) {
-        String currentDay = Commons.getDaystamp();
-        if(quotesEntity == null || ! quotesEntity.getQuoteFetchDay().equals(currentDay)) {
-            JsonObject quotesStatusDocument = configPersist.get("quotes_status");
-            if(quotesStatusDocument == null)
-                quotesStatusDocument = new JsonObject();
+        QuotesEntity quoteOfTheDay = quotesService.getQuoteOfTheDay();
+        userHomePageStatsEntity.setQuoteId(quoteOfTheDay.getQuotesId());
+        userHomePageStatsEntity.setQuoteOfTheDay(quoteOfTheDay.getQuote());
 
-            JsonObject quotesObject = configPersist.get("quotes");
-            if(! quotesStatusDocument.has("dayStamp") || ! quotesStatusDocument.get("dayStamp").getAsString().equals(currentDay)) {
-                updateNewQuote(currentDay, quotesObject);
-                saveConfigStatusDocument();
-            }
-            else {
-                updateQuoteCache(quotesStatusDocument, quotesObject);
-            }
-        }
-
-        userHomePageStatsEntity.setQuoteOfTheDay(quotesEntity.getQuote());
         StringBuilder quotesAuthorBuilder = new StringBuilder();
-        quotesAuthorBuilder.append(quotesEntity.getAuthor());
+        quotesAuthorBuilder.append(quoteOfTheDay.getAuthor());
 
-        if(! quotesEntity.getAuthorCredentials().isEmpty()) {
+        if(! quoteOfTheDay.getAuthorCredentials().isEmpty()) {
             quotesAuthorBuilder.append(" (");
-            quotesAuthorBuilder.append(quotesEntity.getAuthorCredentials());
+            quotesAuthorBuilder.append(quoteOfTheDay.getAuthorCredentials());
             quotesAuthorBuilder.append(")");
         }
         userHomePageStatsEntity.setQuoteAuthor(quotesAuthorBuilder.toString());
-    }
-
-    private void updateQuoteCache(JsonObject quotesStatusDocument, JsonObject quotesObject) {
-        String dayStamp = quotesStatusDocument.get("dayStamp").getAsString();
-        String quoteId = quotesStatusDocument.get("quoteId").getAsString();
-        JsonObject currentQuote = quotesObject.get(quoteId).getAsJsonObject();
-
-        quotesEntity = new QuotesEntity(quoteId,
-                currentQuote.get("quote").getAsString(),
-                currentQuote.get("author").getAsString(),
-                currentQuote.get("author_credentials").getAsString(),
-                dayStamp
-        );
-    }
-
-    private void saveConfigStatusDocument() {
-        JsonObject configStatusDocument = new JsonObject();
-        configStatusDocument.addProperty("dayStamp", quotesEntity.getQuoteFetchDay());
-        configStatusDocument.addProperty("quoteId", quotesEntity.getQuotesId());
-        configPersist.set("quotes_status", configStatusDocument);
-    }
-
-    private void updateNewQuote(String currentDay, JsonObject quotesObject) {
-        int numQuotes = quotesObject.entrySet().size();
-        JsonObject selectedQuoteForTheDay;
-        int idSequence;
-        while(true) {
-            idSequence = random.nextInt(numQuotes) + 1;
-            if(! quotesObject.has("q" + idSequence))
-                continue;
-
-            selectedQuoteForTheDay = quotesObject.get("q" + idSequence).getAsJsonObject();
-            break;
-        }
-
-        quotesEntity = new QuotesEntity("q" + idSequence,
-                selectedQuoteForTheDay.get("quote").getAsString(),
-                selectedQuoteForTheDay.get("author").getAsString(),
-                selectedQuoteForTheDay.get("author_credentials").getAsString(),
-                currentDay
-        );
     }
 
     private void updateAccountType(JsonObject userProfileDocument, UserHomePageStatsEntity userHomePageStatsEntity) {

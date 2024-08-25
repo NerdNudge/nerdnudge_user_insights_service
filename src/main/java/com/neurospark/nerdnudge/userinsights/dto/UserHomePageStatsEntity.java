@@ -15,5 +15,6 @@ public class UserHomePageStatsEntity {
     private int shotsCountToday = 0;
     private String quoteOfTheDay = "You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.";
     private String quoteAuthor = "Dr. Seuss (author)";
+    private String quoteId = "q14";
     private long numPeopleUsedNerdNudgeToday = 654;
 }

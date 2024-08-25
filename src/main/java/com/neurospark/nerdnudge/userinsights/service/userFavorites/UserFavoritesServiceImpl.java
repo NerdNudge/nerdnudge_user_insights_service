@@ -4,9 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
+import com.neurospark.nerdnudge.userinsights.dto.QuotesEntity;
 import com.neurospark.nerdnudge.userinsights.dto.UserFavoriteTopicsEntity;
-import com.neurospark.nerdnudge.userinsights.dto.UserRecentFavoritesEntity;
 import com.neurospark.nerdnudge.userinsights.response.ApiResponse;
+import com.neurospark.nerdnudge.userinsights.service.quotes.Quotes;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +26,9 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private Quotes quotesService;
 
     public NerdPersistClient userProfilesPersist;
 
@@ -70,7 +74,7 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
 
             UserFavoriteTopicsEntity userFavoriteTopicsEntity = new UserFavoriteTopicsEntity();
             userFavoriteTopicsEntity.setTopicName(thisEntry.getKey());
-            userFavoriteTopicsEntity.setNumFavoriteSubtopics(thisTopicObject.size());
+            userFavoriteTopicsEntity.setSubtopics(new ArrayList<>());
 
             Iterator<Map.Entry<String, JsonElement>> subtopicsIterator = thisTopicObject.entrySet().iterator();
             int totalFavorites = 0;
@@ -78,11 +82,32 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
                 Map.Entry<String, JsonElement> thisSubtopicEntry = subtopicsIterator.next();
                 JsonArray thisSubtopicArray = thisSubtopicEntry.getValue().getAsJsonArray();
                 totalFavorites += thisSubtopicArray.size();
+                userFavoriteTopicsEntity.getSubtopics().add(new UserFavoriteTopicsEntity.SubtopicsWithCounts(thisSubtopicEntry.getKey(), thisSubtopicArray.size()));
             }
 
             userFavoriteTopicsEntity.setFavoritesCount(totalFavorites);
-
             result.add(userFavoriteTopicsEntity);
+        }
+        return result;
+    }
+
+    @Override
+    public List<QuotesEntity> getFavoritesQuotes(String userId) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        List<QuotesEntity> result = new ArrayList<>();
+        if(! userData.has("favorites"))
+            return result;
+
+        JsonObject favoritesObject = userData.get("favorites").getAsJsonObject();
+        if(!favoritesObject.has("quotes"))
+            return result;
+
+        JsonArray quotesArray = favoritesObject.get("quotes").getAsJsonArray();
+        for(int i = 0; i < quotesArray.size(); i ++) {
+            String thisQuoteId = quotesArray.get(i).getAsString();
+            QuotesEntity thisQuoteEntity = quotesService.getQuoteById(thisQuoteId);
+            if(thisQuoteEntity != null)
+                result.add(thisQuoteEntity);
         }
         return result;
     }
