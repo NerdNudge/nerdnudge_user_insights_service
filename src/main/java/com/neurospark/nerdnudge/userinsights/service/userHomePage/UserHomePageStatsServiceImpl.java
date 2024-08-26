@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.QuotesEntity;
 import com.neurospark.nerdnudge.userinsights.dto.UserHomePageStatsEntity;
-import com.neurospark.nerdnudge.userinsights.service.quotes.Quotes;
+import com.neurospark.nerdnudge.userinsights.service.quotes.QuotesService;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,7 +21,7 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
     private NerdPersistClient configPersist;
 
     @Autowired
-    private Quotes quotesService;
+    private QuotesService quotesService;
 
     @Autowired
     public void UserInsightsServiceImpl(@Qualifier("userProfilesPersist") NerdPersistClient userProfilesPersist,

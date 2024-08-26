@@ -5,13 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.UserTopicsStatsEntity;
+import com.neurospark.nerdnudge.userinsights.dto.insights.UserInsightsEntity;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,8 +34,15 @@ public class UserInsightsServiceImpl implements UserInsightsService {
     }
 
     @Override
-    public JsonObject getUserInsights(String userId) {
-        return Commons.getUserProfileDocument(userId, userProfilesPersist);
+    public UserInsightsEntity getUserInsights(String userId) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        UserInsightsEntity userInsightsEntity = new UserInsightsEntity();
+        userInsightsEntity.setOverallSummary(new OverallSummaryService().getOverallSummaryEntity(userData));
+        userInsightsEntity.setTopicSummary(new TopicSummaryService().getTopicSummaryEntity(userData));
+        userInsightsEntity.setTrendSummary(new TrendSummaryService().getTrendSummaryEntity(userData));
+        userInsightsEntity.setHeatMap(new HeatmapSummaryService().getHeatmapEntity(userData));
+
+        return userInsightsEntity;
     }
 
     @Override

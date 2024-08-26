@@ -9,6 +9,7 @@ import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,33 @@ public class Commons {
         String dayOfYearStr = String.format("%03d", dayOfYear);
         String yearStr = String.format("%02d", year);
         return dayOfYearStr + yearStr;
+    }
+
+    public static int getDaysDifferenceFromToday(String currentKey) {
+        int dayOfYearCurrentKey = Integer.parseInt(currentKey.substring(0, 3));
+        int yearCurrentKey = Integer.parseInt(currentKey.substring(3, 5));
+
+        String currentDay = getDaystamp();
+        int dayOfYearToday = Integer.parseInt(currentDay.substring(0, 3));
+        int yearToday = Integer.parseInt(currentDay.substring(3, 5));
+
+        int daysDifference = 0;
+
+        if (yearCurrentKey == yearToday) {
+            daysDifference = dayOfYearToday - dayOfYearCurrentKey;
+        } else if (yearCurrentKey < yearToday) {
+            daysDifference = (365 - dayOfYearCurrentKey) + dayOfYearToday + (yearToday - yearCurrentKey - 1) * 365;
+        }
+        return daysDifference;
+    }
+
+    public static String convertDayStringToReadable(String dayString, String pattern) {
+        int dayOfYear = Integer.parseInt(dayString.substring(0, 3));
+        int year = Integer.parseInt("20" + dayString.substring(3, 5));
+
+        LocalDate date = LocalDate.ofYearDay(year, dayOfYear);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return date.format(formatter);
     }
 
     public static JsonObject getUserProfileDocument(String userId, NerdPersistClient userProfilesPersist) {

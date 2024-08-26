@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.Random;
 
 @Service
-public class Quotes {
-    private static Quotes instance;
+public class QuotesService {
     static Map<String, QuotesEntity> allQuotes;
     private NerdPersistClient configPersist;
     private Random random = new Random();
