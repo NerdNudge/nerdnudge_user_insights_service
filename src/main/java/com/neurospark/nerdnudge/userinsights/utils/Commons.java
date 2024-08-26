@@ -123,4 +123,12 @@ public class Commons {
         LocalDate currentDate = LocalDate.now();
         return ChronoUnit.DAYS.between(dateFromEpoch, currentDate);
     }
+
+    public static double getPercentage(int total, int correct) {
+        if(total == 0)
+            return 0.0;
+
+        double percentage = ((double) correct / total) * 100;
+        return Math.round(percentage * 100.0) / 100.0;
+    }
 }

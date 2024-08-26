@@ -197,17 +197,9 @@ public class OverallSummaryService {
     private double getPercentage(JsonObject overallSummaryObject, String difficulty) {
         if(overallSummaryObject.has(difficulty)) {
             JsonArray array = overallSummaryObject.get(difficulty).getAsJsonArray();
-            return getPercentage(array.get(0).getAsInt(), array.get(1).getAsInt());
+            return Commons.getPercentage(array.get(0).getAsInt(), array.get(1).getAsInt());
         }
         return 0.0;
-    }
-
-    private double getPercentage(int total, int correct) {
-        if(total == 0)
-            return 0.0;
-
-        double percentage = ((double) correct / total) * 100;
-        return Math.round(percentage * 100.0) / 100.0;
     }
 
     private Last30DaysEntity getLast30DaysEntity(JsonObject userData) {
