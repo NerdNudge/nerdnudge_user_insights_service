@@ -10,6 +10,7 @@ import com.neurospark.nerdnudge.userinsights.utils.Commons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 
 import java.time.Instant;
@@ -25,12 +26,15 @@ public class UserInsightsServiceImpl implements UserInsightsService {
 
     private NerdPersistClient configPersist;
     private NerdPersistClient userProfilesPersist;
+    private UserRanksAndScoresService userRanksAndScoresService;
 
     @Autowired
     public void UserInsightsServiceImpl(@Qualifier("configPersist") NerdPersistClient configPersist,
-                                        @Qualifier("userProfilesPersist") NerdPersistClient userProfilesPersist) {
+                                        @Qualifier("userProfilesPersist") NerdPersistClient userProfilesPersist,
+                                        UserRanksAndScoresService userRanksAndScoresService) {
         this.configPersist = configPersist;
         this.userProfilesPersist = userProfilesPersist;
+        this.userRanksAndScoresService = userRanksAndScoresService;
     }
 
     @Override
@@ -39,8 +43,9 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         UserInsightsEntity userInsightsEntity = new UserInsightsEntity();
         userInsightsEntity.setOverallSummary(new OverallSummaryService().getOverallSummaryEntity(userData));
         userInsightsEntity.setTopicSummary(new TopicSummaryService().getTopicSummaryEntity(userData));
-        userInsightsEntity.setTrendSummary(new TrendSummaryService().getTrendSummaryEntity(userData));
+        userInsightsEntity.setTrendSummary(new TrendSummaryService().getTrendSummaryEntity(userId, userProfilesPersist));
         userInsightsEntity.setHeatMap(new HeatmapSummaryService().getHeatmapEntity(userData));
+        userRanksAndScoresService.updateUserRanksAndScores(userInsightsEntity);
 
         return userInsightsEntity;
     }

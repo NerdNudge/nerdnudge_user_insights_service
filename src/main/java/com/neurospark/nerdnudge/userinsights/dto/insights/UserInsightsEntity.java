@@ -13,4 +13,6 @@ public class UserInsightsEntity {
     private TopicSummaryEntity topicSummary;
     private TrendSummaryEntity trendSummary;
     private Map<String, Integer[]> heatMap;
+    private Map<String, Integer> rankings;
+    private Map<String, Double> scores;
 }
