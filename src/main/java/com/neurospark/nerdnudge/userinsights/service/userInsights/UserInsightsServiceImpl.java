@@ -27,6 +27,8 @@ public class UserInsightsServiceImpl implements UserInsightsService {
     private NerdPersistClient configPersist;
     private NerdPersistClient userProfilesPersist;
     private UserRanksAndScoresService userRanksAndScoresService;
+    public static JsonObject topicNameToTopicCodeMapping = null;
+    public static JsonObject topicCodeToTopicNameMapping = null;
 
     @Autowired
     public void UserInsightsServiceImpl(@Qualifier("configPersist") NerdPersistClient configPersist,
@@ -35,6 +37,25 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         this.configPersist = configPersist;
         this.userProfilesPersist = userProfilesPersist;
         this.userRanksAndScoresService = userRanksAndScoresService;
+        if(topicNameToTopicCodeMapping == null)
+            updateTopicCodeMaps();
+    }
+
+    private void updateTopicCodeMaps() {
+        System.out.println("Updating topic code map.");
+        JsonObject topicCodeToTopicNameMappingObject = configPersist.get("collection_topic_mapping");
+        topicNameToTopicCodeMapping = new JsonObject();
+        topicCodeToTopicNameMapping = new JsonObject();
+
+        Iterator<Map.Entry<String, JsonElement>> topicsIterator = topicCodeToTopicNameMappingObject.entrySet().iterator();
+        while(topicsIterator.hasNext()) {
+            Map.Entry<String, JsonElement> thisEntry = topicsIterator.next();
+            topicNameToTopicCodeMapping.addProperty(thisEntry.getValue().getAsString(), thisEntry.getKey());
+            topicCodeToTopicNameMapping.addProperty(thisEntry.getKey(), thisEntry.getValue().getAsString());
+        }
+
+        System.out.println("Topic Name To Codes Mapping: " + topicNameToTopicCodeMapping);
+        System.out.println("Topic Code To Names Mapping: " + topicCodeToTopicNameMapping);
     }
 
     @Override
@@ -99,7 +120,7 @@ public class UserInsightsServiceImpl implements UserInsightsService {
             return "Today";
 
         if(daysDifference < 30)
-            return (daysDifference + "days ago");
+            return (daysDifference + " days ago");
 
         LocalDateTime dateTime = Instant.ofEpochMilli(epoch).atZone(ZoneId.systemDefault()).toLocalDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");

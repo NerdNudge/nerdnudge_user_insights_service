@@ -34,6 +34,9 @@ public class TopicSummaryService {
         while(topicsIterator.hasNext()) {
             Map.Entry<String, JsonElement> thisEntry = topicsIterator.next();
             String topicId = thisEntry.getKey();
+            if(! UserInsightsServiceImpl.topicCodeToTopicNameMapping.has(topicId))
+                continue;
+
             JsonObject topicObject = thisEntry.getValue().getAsJsonObject();
 
             TopicEntity thisTopicEntity = new TopicEntity();
@@ -72,6 +75,9 @@ public class TopicSummaryService {
         while (last30DaysIterator.hasNext()) {
             Map.Entry<String, JsonElement> currentTopicEntry = last30DaysIterator.next();
             String currentTopic = currentTopicEntry.getKey();
+            if(! UserInsightsServiceImpl.topicCodeToTopicNameMapping.has(currentTopic))
+                continue;
+
             JsonObject currentTopicObject = currentTopicEntry.getValue().getAsJsonObject();
             if(! currentTopicObject.has("summary"))
                 continue;
