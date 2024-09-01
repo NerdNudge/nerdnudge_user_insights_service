@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.insights.summaryInsights.*;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
 
@@ -13,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 public class OverallSummaryService {
-    public OverallSummaryEntity getOverallSummaryEntity(JsonObject userData) {
+    private NerdPersistClient shotsStatsPersist;
+    public OverallSummaryEntity getOverallSummaryEntity(JsonObject userData, NerdPersistClient shotsStatsPersist) {
+        this.shotsStatsPersist = shotsStatsPersist;
         OverallSummaryEntity overallSummaryEntity = new OverallSummaryEntity();
         overallSummaryEntity.setLifetime(getLifetimeEntity(userData));
         overallSummaryEntity.setLast30Days(getLast30DaysEntity(userData));
+        overallSummaryEntity.setPeerComparison(getPeerComparisonEntity(userData));
         return overallSummaryEntity;
     }
 
@@ -96,6 +100,10 @@ public class OverallSummaryService {
         summaryStatsEntity.setStats(getStatsEntity(overallSummaryObject));
         summaryStatsEntity.setAccuracy(getAccuracyEntity(overallSummaryObject));
         return summaryStatsEntity;
+    }
+
+    private PeerComparisonEntity getPeerComparisonEntity(JsonObject userData) {
+        return new PeerComparisonService().getPeerComparisonEntity("global", userData, shotsStatsPersist);
     }
 
     private JsonObject getLifetimeOverallSummaryObject(JsonObject userData) {

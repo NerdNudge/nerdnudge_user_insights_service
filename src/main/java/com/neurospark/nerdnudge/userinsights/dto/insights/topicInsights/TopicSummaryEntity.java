@@ -1,5 +1,6 @@
 package com.neurospark.nerdnudge.userinsights.dto.insights.topicInsights;
 
+import com.neurospark.nerdnudge.userinsights.dto.insights.summaryInsights.PeerComparisonEntity;
 import lombok.Data;
 
 import java.util.Map;

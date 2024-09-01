@@ -6,4 +6,5 @@ import lombok.Data;
 public class OverallSummaryEntity {
     private LifetimeEntity lifetime;
     private Last30DaysEntity last30Days;
+    private PeerComparisonEntity peerComparison;
 }

@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
+import com.neurospark.nerdnudge.userinsights.dto.insights.summaryInsights.PeerComparisonEntity;
 import com.neurospark.nerdnudge.userinsights.dto.insights.topicInsights.TopicEntity;
 import com.neurospark.nerdnudge.userinsights.dto.insights.topicInsights.TopicSummaryEntity;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
@@ -13,18 +15,18 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class TopicSummaryService {
-    public TopicSummaryEntity getTopicSummaryEntity(JsonObject userData) {
+    public TopicSummaryEntity getTopicSummaryEntity(JsonObject userData, NerdPersistClient shotsStatsPersist) {
         TopicSummaryEntity topicSummaryEntity = new TopicSummaryEntity();
         if(! userData.has("topicwise"))
             return topicSummaryEntity;
 
-        topicSummaryEntity.setLifetime(getLifetimeTopicSummary(userData.get("topicwise").getAsJsonObject()));
+        topicSummaryEntity.setLifetime(getLifetimeTopicSummary(userData.get("topicwise").getAsJsonObject(), shotsStatsPersist));
         topicSummaryEntity.setLast30Days(getLast30DaysTopicSummary(userData.get("topicwise").getAsJsonObject()));
 
         return topicSummaryEntity;
     }
 
-    private Map<String, TopicEntity> getLifetimeTopicSummary(JsonObject topicwiseObject) {
+    private Map<String, TopicEntity> getLifetimeTopicSummary(JsonObject topicwiseObject, NerdPersistClient shotsStatsPersist) {
         Map<String, TopicEntity> lifetimeSummary = new HashMap<>();
         if(! topicwiseObject.has("overall"))
             return lifetimeSummary;
@@ -59,6 +61,7 @@ public class TopicSummaryService {
                     thisTopicEntity.getSubtopics().put(subtopicId, percentCorrect);
                 }
             }
+            thisTopicEntity.setPeerComparison(new PeerComparisonService().getPeerComparisonEntity(topicId, topicObject, shotsStatsPersist));
             lifetimeSummary.put(topicId, thisTopicEntity);
         }
 

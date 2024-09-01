@@ -7,5 +7,4 @@ public class SummaryStatsEntity {
     private int rank;
     private StatsEntity stats;
     private AccuracyEntity accuracy;
-    private PeerComparisonEntity peerComparison;
 }

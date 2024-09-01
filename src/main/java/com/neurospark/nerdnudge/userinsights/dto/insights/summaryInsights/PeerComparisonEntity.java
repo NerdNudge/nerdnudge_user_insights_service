@@ -12,5 +12,4 @@ public class PeerComparisonEntity {
 
     private double userAverage;
     private double peersAverage;
-    private double topAverage;
 }

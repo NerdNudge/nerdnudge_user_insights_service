@@ -26,6 +26,7 @@ public class UserInsightsServiceImpl implements UserInsightsService {
 
     private NerdPersistClient configPersist;
     private NerdPersistClient userProfilesPersist;
+    private NerdPersistClient shotsStatsPersist;
     private UserRanksAndScoresService userRanksAndScoresService;
     public static JsonObject topicNameToTopicCodeMapping = null;
     public static JsonObject topicCodeToTopicNameMapping = null;
@@ -33,9 +34,11 @@ public class UserInsightsServiceImpl implements UserInsightsService {
     @Autowired
     public void UserInsightsServiceImpl(@Qualifier("configPersist") NerdPersistClient configPersist,
                                         @Qualifier("userProfilesPersist") NerdPersistClient userProfilesPersist,
+                                        @Qualifier("shotsStatsPersist") NerdPersistClient shotsStatsPersist,
                                         UserRanksAndScoresService userRanksAndScoresService) {
         this.configPersist = configPersist;
         this.userProfilesPersist = userProfilesPersist;
+        this.shotsStatsPersist = shotsStatsPersist;
         this.userRanksAndScoresService = userRanksAndScoresService;
         if(topicNameToTopicCodeMapping == null)
             updateTopicCodeMaps();
@@ -62,8 +65,8 @@ public class UserInsightsServiceImpl implements UserInsightsService {
     public UserInsightsEntity getUserInsights(String userId) {
         JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
         UserInsightsEntity userInsightsEntity = new UserInsightsEntity();
-        userInsightsEntity.setOverallSummary(new OverallSummaryService().getOverallSummaryEntity(userData));
-        userInsightsEntity.setTopicSummary(new TopicSummaryService().getTopicSummaryEntity(userData));
+        userInsightsEntity.setOverallSummary(new OverallSummaryService().getOverallSummaryEntity(userData, shotsStatsPersist));
+        userInsightsEntity.setTopicSummary(new TopicSummaryService().getTopicSummaryEntity(userData, shotsStatsPersist));
         userInsightsEntity.setTrendSummary(new TrendSummaryService().getTrendSummaryEntity(userId, userProfilesPersist));
         userInsightsEntity.setHeatMap(new HeatmapSummaryService().getHeatmapEntity(userData));
         userRanksAndScoresService.updateUserRanksAndScores(userInsightsEntity);
