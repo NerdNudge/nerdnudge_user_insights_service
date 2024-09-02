@@ -67,9 +67,9 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         UserInsightsEntity userInsightsEntity = new UserInsightsEntity();
         userInsightsEntity.setOverallSummary(new OverallSummaryService().getOverallSummaryEntity(userData, shotsStatsPersist));
         userInsightsEntity.setTopicSummary(new TopicSummaryService().getTopicSummaryEntity(userData, shotsStatsPersist));
-        userInsightsEntity.setTrendSummary(new TrendSummaryService().getTrendSummaryEntity(userId, userProfilesPersist));
+        userRanksAndScoresService.updateUserRanksAndScores(userInsightsEntity, userId);
+        userInsightsEntity.setTrendSummary(new TrendSummaryService().getTrendSummaryEntity(userId, userProfilesPersist, userInsightsEntity));
         userInsightsEntity.setHeatMap(new HeatmapSummaryService().getHeatmapEntity(userData));
-        userRanksAndScoresService.updateUserRanksAndScores(userInsightsEntity);
 
         return userInsightsEntity;
     }

@@ -15,6 +15,9 @@ public class PeerComparisonService {
 
         double userAverage = 0.0;
         JsonObject overallSummaryObject = getInputJsonObject(topicCode, userData);
+        if(overallSummaryObject == null)
+            return peerComparisonEntity;
+
         if(topicCode.equals("global")) {
             if(overallSummaryObject.has("total")) {
                 JsonArray totalArray = overallSummaryObject.get("total").getAsJsonArray();

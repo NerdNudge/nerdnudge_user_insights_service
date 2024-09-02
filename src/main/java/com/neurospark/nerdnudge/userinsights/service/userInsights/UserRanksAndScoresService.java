@@ -15,7 +15,7 @@ public class UserRanksAndScoresService {
     private RestTemplate restTemplate;
     private final String userRankingServiceBaseURL;
 
-    private String userRanksAndScoresUrlPath = "/getUserRanksAndScores/abc917@gmail.com";
+    private String userRanksAndScoresUrlPath = "/getUserRanksAndScores/";
 
     @Autowired
     public UserRanksAndScoresService(RestTemplate restTemplate,
@@ -24,8 +24,8 @@ public class UserRanksAndScoresService {
         this.userRankingServiceBaseURL = userRankingServiceBaseURL;
     }
 
-    public void updateUserRanksAndScores(UserInsightsEntity userInsightsEntity) {
-        ApiResponse<LinkedHashMap> response = restTemplate.getForObject(userRankingServiceBaseURL + userRanksAndScoresUrlPath, ApiResponse.class);
+    public void updateUserRanksAndScores(UserInsightsEntity userInsightsEntity, String userId) {
+        ApiResponse<LinkedHashMap> response = restTemplate.getForObject(userRankingServiceBaseURL + userRanksAndScoresUrlPath + userId, ApiResponse.class);
 
         LinkedHashMap ranksAndScores = response.getData();
         userInsightsEntity.setRankings((Map<String, Integer>) ranksAndScores.get("topicsRank"));
