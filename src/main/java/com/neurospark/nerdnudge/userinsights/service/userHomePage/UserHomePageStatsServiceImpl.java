@@ -19,6 +19,7 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
 
     private NerdPersistClient userProfilesPersist;
     private NerdPersistClient configPersist;
+    private JsonObject nerdConfigDocument = null;
 
     @Autowired
     private QuotesService quotesService;
@@ -46,6 +47,33 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
         updateCurrentDayCounts(userProfileDocument, userHomePageStatsEntity);
         updateQuote(userHomePageStatsEntity);
         updateNumPeopleUsedNerdNudgeToday(userHomePageStatsEntity);
+        updateAdsFrequency(userHomePageStatsEntity);
+        updateNerdQuota(userHomePageStatsEntity);
+    }
+
+    private void updateNerdQuota(UserHomePageStatsEntity userHomePageStatsEntity) {
+        if(nerdConfigDocument == null)
+            nerdConfigDocument = configPersist.get("nerd_config");
+
+        JsonObject dailyNerdQuota = nerdConfigDocument.get("dailyNerdQuota").getAsJsonObject();
+        JsonObject quizFlexQuota = dailyNerdQuota.get("quizflex").getAsJsonObject();
+        JsonObject shotsQuota = dailyNerdQuota.get("shots").getAsJsonObject();
+
+        userHomePageStatsEntity.setQuizflexQuota(quizFlexQuota.get(userHomePageStatsEntity.getAccountType()).getAsInt());
+        userHomePageStatsEntity.setShotsQuota(shotsQuota.get(userHomePageStatsEntity.getAccountType()).getAsInt());
+    }
+
+    private void updateAdsFrequency(UserHomePageStatsEntity userHomePageStatsEntity) {
+        if(nerdConfigDocument == null)
+            nerdConfigDocument = configPersist.get("nerd_config");
+
+        if(userHomePageStatsEntity.getAccountType().equalsIgnoreCase("freemium")) {
+            userHomePageStatsEntity.setAdsFrequencyQuizFlex(nerdConfigDocument.get("freemiumAdsFrequency_quizflex").getAsInt());
+            userHomePageStatsEntity.setAdsFrequencyShots(nerdConfigDocument.get("freemiumAdsFrequency_shots").getAsInt());
+        } else {
+            userHomePageStatsEntity.setAdsFrequencyQuizFlex(0);
+            userHomePageStatsEntity.setAdsFrequencyShots(0);
+        }
     }
 
     private void updateNumPeopleUsedNerdNudgeToday(UserHomePageStatsEntity userHomePageStatsEntity) {

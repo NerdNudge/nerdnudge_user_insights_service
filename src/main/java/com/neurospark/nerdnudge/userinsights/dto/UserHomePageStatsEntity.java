@@ -17,4 +17,8 @@ public class UserHomePageStatsEntity {
     private String quoteAuthor = "Dr. Seuss (author)";
     private String quoteId = "q14";
     private long numPeopleUsedNerdNudgeToday = 654;
+    private int adsFrequencyQuizFlex = 7;
+    private int adsFrequencyShots = 9;
+    private int quizflexQuota = 12;
+    private int shotsQuota = 15;
 }
