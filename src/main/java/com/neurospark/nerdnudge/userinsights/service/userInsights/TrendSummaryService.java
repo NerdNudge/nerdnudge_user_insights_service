@@ -58,6 +58,8 @@ public class TrendSummaryService {
         Map<String, Integer> userRankings = userInsightsEntity.getRankings();
         Map<String, Double> userScores = userInsightsEntity.getScores();
         String currentDay = Commons.getDaystamp();
+        if(userScores == null)
+            return;
 
         for(String topic: userScores.keySet()) {
             JsonArray currentDayArray = new JsonArray();
