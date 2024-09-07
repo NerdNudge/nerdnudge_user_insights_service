@@ -49,4 +49,9 @@ public class UserInsightsController {
         long endTime = System.currentTimeMillis();
         return new ApiResponse<>(Constants.SUCCESS, "User topics stats fetched successfully", userTopicsStatsEntity, (endTime - startTime));
     }
+
+    @GetMapping("/health")
+    public ApiResponse<String> healthCheck() {
+        return new ApiResponse<>(Constants.SUCCESS, "Health Check Pass", Constants.SUCCESS, 0);
+    }
 }

@@ -50,9 +50,17 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
 
         JsonArray recentArray = favoritesObject.get("recent").getAsJsonArray();
         System.out.println(contentManagerBaseUrl + recentFavoritesUrl);
-        ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, recentArray.toString(), ApiResponse.class);
+        ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, reverseArray(recentArray).toString(), ApiResponse.class);
 
         return response.getData();
+    }
+
+    private JsonArray reverseArray(JsonArray array) {
+        JsonArray reversedArray = new JsonArray();
+        for (int i = array.size() - 1; i >= 0; i--) {
+            reversedArray.add(array.get(i));
+        }
+        return reversedArray;
     }
 
     @Override
@@ -103,12 +111,13 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
             return result;
 
         JsonArray quotesArray = favoritesObject.get("quotes").getAsJsonArray();
-        for(int i = 0; i < quotesArray.size(); i ++) {
+        for(int i = quotesArray.size() - 1; i >= 0; i --) {
             String thisQuoteId = quotesArray.get(i).getAsString();
             QuotesEntity thisQuoteEntity = quotesService.getQuoteById(thisQuoteId);
             if(thisQuoteEntity != null)
                 result.add(thisQuoteEntity);
         }
+
         return result;
     }
 }
