@@ -21,7 +21,7 @@ public class TopicSummaryService {
             return topicSummaryEntity;
 
         topicSummaryEntity.setLifetime(getLifetimeTopicSummary(userData.get("topicwise").getAsJsonObject(), shotsStatsPersist));
-        topicSummaryEntity.setLast30Days(getLast30DaysTopicSummary(userData.get("topicwise").getAsJsonObject()));
+        topicSummaryEntity.setLast30Days(getLast30DaysTopicSummary(userData.get("topicwise").getAsJsonObject(), topicSummaryEntity.getLifetime()));
 
         return topicSummaryEntity;
     }
@@ -68,7 +68,8 @@ public class TopicSummaryService {
         return lifetimeSummary;
     }
 
-    private Map<String, TopicEntity> getLast30DaysTopicSummary(JsonObject topicwiseObject) {
+    //TODO: Temporarily added peercomparison of lifetime into last 30 days.
+    private Map<String, TopicEntity> getLast30DaysTopicSummary(JsonObject topicwiseObject, Map<String, TopicEntity> lifetimeEntity) {
         Map<String, TopicEntity> last30DaysSummary = new HashMap<>();
         if(! topicwiseObject.has("last30Days"))
             return last30DaysSummary;
@@ -95,9 +96,43 @@ public class TopicSummaryService {
             thisTopicEntity.setMedium(last30DaysSubtopicCounts.get(1).getAsInt());
             thisTopicEntity.setHard(last30DaysSubtopicCounts.get(2).getAsInt());
 
+            thisTopicEntity.setSubtopics(getSubtopicsForLast30Days(currentTopicObject));
+
+            thisTopicEntity.setPeerComparison(lifetimeEntity.get(currentTopic).getPeerComparison());
             last30DaysSummary.put(currentTopic, thisTopicEntity);
         }
         return last30DaysSummary;
+    }
+
+    private Map<String, Double> getSubtopicsForLast30Days(JsonObject currentTopicObject) {
+        Map<String, Double> subtopicsMap = new HashMap<>();
+        if(!currentTopicObject.has("subtopics"))
+            return subtopicsMap;
+
+        Iterator<Map.Entry<String, JsonElement>> subtopicsIterator = currentTopicObject.get("subtopics").getAsJsonObject().entrySet().iterator();
+        while(subtopicsIterator.hasNext()) {
+            Map.Entry<String, JsonElement> thisEntry = subtopicsIterator.next();
+            String subtopic = thisEntry.getKey();
+            int currentTotal = 0;
+            int currentCorrect = 0;
+            JsonObject subtopicObject = thisEntry.getValue().getAsJsonObject();
+            Iterator<Map.Entry<String, JsonElement>> subtopicDatesIterator = subtopicObject.entrySet().iterator();
+            while(subtopicDatesIterator.hasNext()) {
+                Map.Entry<String, JsonElement> subtopicEntry = subtopicDatesIterator.next();
+                String currentDate = subtopicEntry.getKey();
+                if(Commons.getDaysDifferenceFromToday(currentDate) > 30)
+                    continue;
+
+                JsonArray currentDateArray = subtopicEntry.getValue().getAsJsonArray();
+                currentTotal += currentDateArray.get(0).getAsInt();
+                currentCorrect += currentDateArray.get(1).getAsInt();
+            }
+
+            if(currentTotal > 0) {
+                subtopicsMap.put(subtopic, Commons.getPercentage(currentTotal, currentCorrect));
+            }
+        }
+        return subtopicsMap;
     }
 
     private JsonArray getLast30DaysSubtopicDifficultyCounts(JsonObject summaryObject) {
