@@ -100,6 +100,32 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
     }
 
     @Override
+    public List<JsonObject> getUserFavoriteSubtopics(String topic, String subtopic, String userId) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        List<JsonObject> result = new ArrayList<>();
+        if(! userData.has("favorites"))
+            return result;
+
+        JsonObject favoritesObject = userData.get("favorites").getAsJsonObject();
+        if(! favoritesObject.has("topicwise"))
+            return result;
+
+        JsonObject topicwiseObject = favoritesObject.get("topicwise").getAsJsonObject();
+        if(! topicwiseObject.has(topic))
+            return result;
+
+        JsonObject currentTopicObject = topicwiseObject.get(topic).getAsJsonObject();
+        if(! currentTopicObject.has(subtopic))
+            return result;
+
+        JsonArray subtopicArray = currentTopicObject.get(subtopic).getAsJsonArray();
+        System.out.println(contentManagerBaseUrl + recentFavoritesUrl);
+        ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, reverseArray(subtopicArray).toString(), ApiResponse.class);
+
+        return response.getData();
+    }
+
+    @Override
     public List<QuotesEntity> getFavoritesQuotes(String userId) {
         JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
         List<QuotesEntity> result = new ArrayList<>();

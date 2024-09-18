@@ -40,6 +40,16 @@ public class UserFavoritesController {
         return new ApiResponse<>(Constants.SUCCESS, "User favorite topics fetched successfully", result, (endTime - startTime));
     }
 
+    @GetMapping("/getUserFavoriteSubtopics/{topic}/{subtopic}/{id}")
+    public ApiResponse<List<JsonObject>> getUserFavoriteSubtopics(@PathVariable(value = "topic") String topic, @PathVariable(value = "subtopic") String subtopic, @PathVariable(value = "id") String userId) {
+        long startTime = System.currentTimeMillis();
+        System.out.println("User favorite Subtopics Data in request: " + userId + ": " + topic + ": " + subtopic);
+
+        List<JsonObject> result = userFavoritesService.getUserFavoriteSubtopics(topic, subtopic, userId);
+        long endTime = System.currentTimeMillis();
+        return new ApiResponse<>(Constants.SUCCESS, "User favorite subtopics fetched successfully", result, (endTime - startTime));
+    }
+
     @GetMapping("/getUserFavoriteQuotes/{id}")
     public ApiResponse<List<QuotesEntity>> getUserFavoriteQuotes(@PathVariable(value = "id") String userId) {
         long startTime = System.currentTimeMillis();

@@ -11,5 +11,7 @@ public interface UserFavoritesService {
 
     public List<UserFavoriteTopicsEntity> getFavoritesTopics(String userId);
 
+    public List<JsonObject> getUserFavoriteSubtopics(String topic, String subtopic, String userId);
+
     public List<QuotesEntity> getFavoritesQuotes(String userId);
 }
