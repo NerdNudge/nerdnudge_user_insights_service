@@ -1,5 +1,6 @@
 package com.neurospark.nerdnudge.userinsights.dto;
 
+import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,4 +9,5 @@ import lombok.Data;
 public class UserTopicsStatsEntity {
     private double personalScoreIndicator;
     private String lastTaken;
+    private JsonObject rwc;
 }

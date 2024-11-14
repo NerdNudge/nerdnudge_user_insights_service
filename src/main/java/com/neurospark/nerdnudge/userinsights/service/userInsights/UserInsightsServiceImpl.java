@@ -85,6 +85,7 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         if(!topicwiseObject.has("overall"))
             return userTopicsStats;
 
+        JsonObject rwcObject = (userData.has("rwc") && ! userData.get("rwc").isJsonNull()) ? userData.get("rwc").getAsJsonObject() : new JsonObject();
         JsonObject overallObject = topicwiseObject.get("overall").getAsJsonObject();
         Iterator<Map.Entry<String, JsonElement>> topicsIterator = overallObject.entrySet().iterator();
         while(topicsIterator.hasNext()) {
@@ -97,7 +98,9 @@ public class UserInsightsServiceImpl implements UserInsightsService {
             JsonArray correctArray = subtopicObject.get("correct").getAsJsonArray();
             double userTopicScore = getUserTopicScoreIndicator(correctArray.get(0).getAsInt(), correctArray.get(1).getAsInt());
             long topicLastTaken = subtopicObject.get("lastTaken").getAsLong();
-            userTopicsStats.put(topic, new UserTopicsStatsEntity(userTopicScore, lastTakenByUser(topicLastTaken)));
+
+            JsonObject topicRWC = rwcObject.has(topic) ? rwcObject.get(topic).getAsJsonObject() : null;
+            userTopicsStats.put(topic, new UserTopicsStatsEntity(userTopicScore, lastTakenByUser(topicLastTaken), topicRWC));
         }
 
         return userTopicsStats;
