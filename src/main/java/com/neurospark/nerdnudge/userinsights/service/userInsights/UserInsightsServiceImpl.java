@@ -7,11 +7,10 @@ import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.UserTopicsStatsEntity;
 import com.neurospark.nerdnudge.userinsights.dto.insights.UserInsightsEntity;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class UserInsightsServiceImpl implements UserInsightsService {
 
@@ -45,7 +45,7 @@ public class UserInsightsServiceImpl implements UserInsightsService {
     }
 
     private void updateTopicCodeMaps() {
-        System.out.println("Updating topic code map.");
+        log.info("Updating topic code map.");
         JsonObject topicCodeToTopicNameMappingObject = configPersist.get("collection_topic_mapping");
         topicNameToTopicCodeMapping = new JsonObject();
         topicCodeToTopicNameMapping = new JsonObject();
@@ -57,8 +57,8 @@ public class UserInsightsServiceImpl implements UserInsightsService {
             topicCodeToTopicNameMapping.addProperty(thisEntry.getKey(), thisEntry.getValue().getAsString());
         }
 
-        System.out.println("Topic Name To Codes Mapping: " + topicNameToTopicCodeMapping);
-        System.out.println("Topic Code To Names Mapping: " + topicCodeToTopicNameMapping);
+        log.info("Topic Name To Codes Mapping: {}", topicNameToTopicCodeMapping);
+        log.info("Topic Code To Names Mapping: {}", topicCodeToTopicNameMapping);
     }
 
     @Override

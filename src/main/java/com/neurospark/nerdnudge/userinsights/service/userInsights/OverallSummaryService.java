@@ -95,7 +95,6 @@ public class OverallSummaryService {
     private SummaryStatsEntity getLast30DaysSummaryStatsEntity(JsonObject userData) {
         SummaryStatsEntity summaryStatsEntity = new SummaryStatsEntity();
         JsonObject overallSummaryObject = getLast30DaysOverallSummaryObject(userData);
-        System.out.println("Last 30 days overall summary object created: " + overallSummaryObject);
 
         summaryStatsEntity.setStats(getStatsEntity(overallSummaryObject));
         summaryStatsEntity.setAccuracy(getAccuracyEntity(overallSummaryObject));
@@ -140,7 +139,6 @@ public class OverallSummaryService {
 
             int daysDifference = Commons.getDaysDifferenceFromToday(currentKey);
             if (daysDifference >= 0 && daysDifference < 30) {
-                System.out.println("Success Current key: " + currentKey);
                 JsonObject thisDayObject = thisEntry.getValue().getAsJsonObject();
                 addToOverallObject(thisDayObject, overallObject, "easy");
                 addToOverallObject(thisDayObject, overallObject, "medium");

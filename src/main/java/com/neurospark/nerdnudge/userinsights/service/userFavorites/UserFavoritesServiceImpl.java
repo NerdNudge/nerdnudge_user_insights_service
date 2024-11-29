@@ -9,6 +9,7 @@ import com.neurospark.nerdnudge.userinsights.dto.UserFavoriteTopicsEntity;
 import com.neurospark.nerdnudge.userinsights.response.ApiResponse;
 import com.neurospark.nerdnudge.userinsights.service.quotes.QuotesService;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+@Slf4j
 @Service
 public class UserFavoritesServiceImpl implements UserFavoritesService {
     @Value("${content.manager.api.baseurl:http://localhost:9093/api/nerdnudge/quizflexes}")
@@ -49,7 +51,7 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
             return result;
 
         JsonArray recentArray = favoritesObject.get("recent").getAsJsonArray();
-        System.out.println(contentManagerBaseUrl + recentFavoritesUrl);
+        log.info("Fetching the recent favorites from: {}{}", contentManagerBaseUrl, recentFavoritesUrl);
         ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, reverseArray(recentArray).toString(), ApiResponse.class);
 
         return response.getData();
@@ -119,7 +121,7 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
             return result;
 
         JsonArray subtopicArray = currentTopicObject.get(subtopic).getAsJsonArray();
-        System.out.println(contentManagerBaseUrl + recentFavoritesUrl);
+        log.info("Fetching the recent favorite subtopics from: {}{}", contentManagerBaseUrl, recentFavoritesUrl);
         ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, reverseArray(subtopicArray).toString(), ApiResponse.class);
 
         return response.getData();

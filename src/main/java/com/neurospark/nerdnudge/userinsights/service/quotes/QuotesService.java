@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
 import com.neurospark.nerdnudge.userinsights.dto.QuotesEntity;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
+@Slf4j
 @Service
 public class QuotesService {
     static Map<String, QuotesEntity> allQuotes;
@@ -38,8 +40,10 @@ public class QuotesService {
     }
 
     public QuotesEntity getQuoteById(String id) {
-        if(! allQuotes.containsKey(id))
+        if(! allQuotes.containsKey(id)) {
+            log.warn("Quote not found, returning null: {}", id);
             return null;
+        }
 
         return allQuotes.get(id);
     }
@@ -62,8 +66,10 @@ public class QuotesService {
     }
 
     private void updateQuoteCache(JsonObject quotesStatusDocument) {
+        String currentDay = Commons.getDaystamp();
         currentDayQuoteEntity = allQuotes.get(quotesStatusDocument.get("quoteId").getAsString());
-        currentDayQuoteEntity.setQuoteFetchDay(Commons.getDaystamp());
+        currentDayQuoteEntity.setQuoteFetchDay(currentDay);
+        log.info("Quote cache updated: {}, with fetch day: {}", quotesStatusDocument, currentDay);
     }
 
     private void saveConfigStatusDocument() {
@@ -71,6 +77,7 @@ public class QuotesService {
         configStatusDocument.addProperty("dayStamp", currentDayQuoteEntity.getQuoteFetchDay());
         configStatusDocument.addProperty("quoteId", currentDayQuoteEntity.getQuotesId());
         configPersist.set("quotes_status", configStatusDocument);
+        log.info("Quotes status document updated: {}", configStatusDocument);
     }
 
     private void buildQuotes() {
@@ -94,14 +101,16 @@ public class QuotesService {
     private void updateCurrentQuoteOfTheDay() {
         int numQuotes = allQuotes.entrySet().size();
         int idSequence;
+        String currentDay = Commons.getDaystamp();
         while(true) {
             idSequence = random.nextInt(numQuotes) + 1;
             if(! allQuotes.containsKey("q" + idSequence))
                 continue;
 
             currentDayQuoteEntity = allQuotes.get("q" + idSequence);
-            currentDayQuoteEntity.setQuoteFetchDay(Commons.getDaystamp());
+            currentDayQuoteEntity.setQuoteFetchDay(currentDay);
             break;
         }
+        log.info("Updated current day quote: {} for day: {}", idSequence, currentDay);
     }
 }

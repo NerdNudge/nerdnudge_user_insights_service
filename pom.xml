@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -12,7 +12,7 @@
 	<artifactId>nerdnudge_userinsights</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>nerdnudge_userinsights</name>
-	<description>Nerd Nudge project that handles the user insights data api requests.</description>
+	<description>Nerd Nudge project that handles the user insights data API requests.</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,37 +28,90 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<log4j2.version>2.20.0</log4j2.version> <!-- Ensure consistent Log4j2 versioning -->
 	</properties>
 	<dependencies>
+		<!-- Spring Boot starter web (excluding logback) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId> <!-- Exclude Spring's default logging (Logback) -->
+				</exclusion>
+			</exclusions>
 		</dependency>
 
+		<!-- Lombok for reducing boilerplate code (optional) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Spring Boot Test Starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Gson library for JSON handling -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.8.0</version>
 		</dependency>
+
+		<!-- Custom dependency for Nerd Nudge project (example) -->
 		<dependency>
 			<groupId>nn-persist</groupId>
 			<artifactId>nn-persist</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+
+		<!-- Log4j2 dependencies for logging -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId> <!-- Spring Boot starter for Log4j2 -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+
+		<!-- SLF4J API for Log4j2 (bridging SLF4J to Log4j2) -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>2.0.9</version> <!-- Ensure compatibility with your SLF4J version -->
+		</dependency>
+
+		<!-- SLF4J to Log4j2 bridge (this routes SLF4J calls to Log4j2) -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j2.version}</version> <!-- Ensure version matches log4j-core version -->
+		</dependency>
+
+		<!-- Additional dependencies (e.g., for metrics or any other libraries) -->
+		<dependency>
+			<groupId>com.neurospark.nerdnudge.metrics</groupId>
+			<artifactId>nerdnudge_metrics</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<!-- Spring Boot Maven plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -71,6 +124,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- Maven Surefire Plugin for testing -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -79,6 +134,8 @@
 					<testFailureIgnore>true</testFailureIgnore>
 				</configuration>
 			</plugin>
+
+			<!-- Maven Dependency Plugin for copying dependencies (e.g., for runtime) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -97,12 +154,14 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Maven Compiler Plugin for Java 17 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>8</source>
-					<target>8</target>
+					<source>17</source>
+					<target>17</target>
 				</configuration>
 			</plugin>
 		</plugins>

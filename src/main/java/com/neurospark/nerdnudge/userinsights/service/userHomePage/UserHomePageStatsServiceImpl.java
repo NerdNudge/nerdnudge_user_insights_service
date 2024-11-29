@@ -7,6 +7,7 @@ import com.neurospark.nerdnudge.userinsights.dto.QuotesEntity;
 import com.neurospark.nerdnudge.userinsights.dto.UserHomePageStatsEntity;
 import com.neurospark.nerdnudge.userinsights.service.quotes.QuotesService;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Slf4j
 @Service
 public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
 
@@ -33,6 +35,7 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
 
     @Override
     public UserHomePageStatsEntity getUserHomePageStats(String id) {
+        log.info("Getting home page stats for user: {}", id);
         UserHomePageStatsEntity userHomePageStatsEntity = new UserHomePageStatsEntity();
         JsonObject userData = Commons.getUserProfileDocument(id, userProfilesPersist);
         updateUserHomePageStatsEntity(userData, userHomePageStatsEntity);

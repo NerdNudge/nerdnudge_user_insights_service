@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+@Slf4j
 public class Commons {
 
     private static Commons instance;
@@ -104,6 +106,7 @@ public class Commons {
     public static JsonObject getUserProfileDocument(String userId, NerdPersistClient userProfilesPersist) {
         JsonObject userData = userProfilesPersist.get(userId);
         if(userData == null) {
+            log.info("User does not exist, creating a new user: {}", userId);
             userData = new JsonObject();
             userData.addProperty("registrationDate", Instant.now().getEpochSecond());
             userData.addProperty("type", "userProfile");
@@ -111,7 +114,6 @@ public class Commons {
             userData.addProperty("accountStartDate", getDaystamp());
         }
 
-        System.out.println("user data returned: " + userData);
         return userData;
     }
 

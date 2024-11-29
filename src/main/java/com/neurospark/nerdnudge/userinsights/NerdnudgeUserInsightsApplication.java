@@ -1,5 +1,6 @@
 package com.neurospark.nerdnudge.userinsights;
 
+import com.neurospark.nerdnudge.metrics.metrics.Metronome;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 public class NerdnudgeUserInsightsApplication {
 
 	public static void main(String[] args) {
+		Metronome.initiateMetrics(60000);
 		SpringApplication.run(NerdnudgeUserInsightsApplication.class, args);
 	}
 

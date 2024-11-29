@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.neurospark.nerdnudge.couchbase.service.NerdPersistClient;
-import com.neurospark.nerdnudge.userinsights.dto.insights.summaryInsights.PeerComparisonEntity;
 import com.neurospark.nerdnudge.userinsights.dto.insights.topicInsights.TopicEntity;
 import com.neurospark.nerdnudge.userinsights.dto.insights.topicInsights.TopicSummaryEntity;
 import com.neurospark.nerdnudge.userinsights.utils.Commons;
