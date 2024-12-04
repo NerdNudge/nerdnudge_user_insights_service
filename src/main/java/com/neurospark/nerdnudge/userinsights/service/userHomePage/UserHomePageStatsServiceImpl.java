@@ -37,8 +37,7 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
     public UserHomePageStatsEntity getUserHomePageStats(String id) {
         log.info("Getting home page stats for user: {}", id);
         UserHomePageStatsEntity userHomePageStatsEntity = new UserHomePageStatsEntity();
-        JsonObject userData = Commons.getUserProfileDocument(id, userProfilesPersist);
-        updateUserHomePageStatsEntity(userData, userHomePageStatsEntity);
+        updateUserHomePageStatsEntity(Commons.getUserProfileDocument(id, userProfilesPersist), userHomePageStatsEntity);
         return userHomePageStatsEntity;
     }
 
@@ -52,6 +51,42 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
         updateNumPeopleUsedNerdNudgeToday(userHomePageStatsEntity);
         updateAdsFrequency(userHomePageStatsEntity);
         updateNerdQuota(userHomePageStatsEntity);
+        updateLast7DaysActivity(userProfileDocument, userHomePageStatsEntity);
+    }
+
+    private void updateLast7DaysActivity(JsonObject userProfileDocument, UserHomePageStatsEntity userHomePageStatsEntity) {
+        JsonObject result = new JsonObject();
+        userHomePageStatsEntity.setLast7DaysActivity(result);
+        if(! userProfileDocument.has("Summary"))
+            return;
+
+        JsonObject summaryObject = userProfileDocument.get("Summary").getAsJsonObject();
+        if(! summaryObject.has("last30Days"))
+            return;
+
+        JsonObject last30DaysObject = summaryObject.get("last30Days").getAsJsonObject();
+        for(int i = 0; i < 8; i ++) {
+            String dayStamp = Commons.getDaystampBeforeXDays(i);
+            if(! last30DaysObject.has(dayStamp))
+                continue;
+
+            JsonObject thisDayObject = last30DaysObject.get(dayStamp).getAsJsonObject();
+            JsonArray easyArray = thisDayObject.get("easy").getAsJsonArray();
+            JsonArray medArray = thisDayObject.get("medium").getAsJsonArray();
+            JsonArray hardArray = thisDayObject.get("hard").getAsJsonArray();
+
+            int totalQuestions = 0;
+            int totalCorrect = 0;
+            totalQuestions += easyArray.get(0).getAsInt();
+            totalQuestions += medArray.get(0).getAsInt();
+            totalQuestions += hardArray.get(0).getAsInt();
+
+            totalCorrect += easyArray.get(1).getAsInt();
+            totalCorrect += medArray.get(1).getAsInt();
+            totalCorrect += hardArray.get(1).getAsInt();
+
+            result.addProperty(dayStamp, Commons.getPercentage(totalQuestions, totalCorrect));
+        }
     }
 
     private void updateNerdQuota(UserHomePageStatsEntity userHomePageStatsEntity) {

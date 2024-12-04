@@ -76,6 +76,15 @@ public class Commons {
         return dayOfYearStr + yearStr;
     }
 
+    public static String getDaystampBeforeXDays(int x) {
+        LocalDate date = LocalDate.now().minusDays(x);
+        int dayOfYear = date.getDayOfYear();
+        int year = date.getYear() % 100;
+        String dayOfYearStr = String.format("%03d", dayOfYear);
+        String yearStr = String.format("%02d", year);
+        return dayOfYearStr + yearStr;
+    }
+
     public static int getDaysDifferenceFromToday(String currentKey) {
         int dayOfYearCurrentKey = Integer.parseInt(currentKey.substring(0, 3));
         int yearCurrentKey = Integer.parseInt(currentKey.substring(3, 5));

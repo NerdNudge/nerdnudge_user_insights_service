@@ -1,5 +1,6 @@
 package com.neurospark.nerdnudge.userinsights.dto;
 
+import com.google.gson.JsonObject;
 import lombok.Data;
 
 @Data
@@ -21,4 +22,5 @@ public class UserHomePageStatsEntity {
     private int adsFrequencyShots = 9;
     private int quizflexQuota = 12;
     private int shotsQuota = 15;
+    private JsonObject last7DaysActivity = new JsonObject();
 }
