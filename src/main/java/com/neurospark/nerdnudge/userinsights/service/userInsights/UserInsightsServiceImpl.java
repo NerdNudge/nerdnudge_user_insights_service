@@ -106,6 +106,17 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         return userTopicsStats;
     }
 
+    @Override
+    public Double getUserTopicScore(String userId, String topic) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        if(! userData.has("scores"))
+            return 0.0;
+
+        JsonObject scoresObject = userData.get("scores").getAsJsonObject();
+        double score = scoresObject.has(topic) ? scoresObject.get(topic).getAsDouble() : 0.0;
+        return Double.parseDouble(String.format("%.2f", score));
+    }
+
     private double getUserTopicScoreIndicator(int numQuizflexes, int correct) {
         int maxQuestions = 2400;
         if (numQuizflexes == 0) {

@@ -53,7 +53,6 @@ public class UserFavoritesServiceImpl implements UserFavoritesService {
         JsonArray recentArray = favoritesObject.get("recent").getAsJsonArray();
         log.info("Fetching the recent favorites from: {}{}", contentManagerBaseUrl, recentFavoritesUrl);
         ApiResponse<List<JsonObject>> response = restTemplate.postForObject(contentManagerBaseUrl + recentFavoritesUrl, reverseArray(recentArray).toString(), ApiResponse.class);
-
         return response.getData();
     }
 
