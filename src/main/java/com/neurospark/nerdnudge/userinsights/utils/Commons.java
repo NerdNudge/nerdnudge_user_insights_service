@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -76,6 +78,14 @@ public class Commons {
         return dayOfYearStr + yearStr;
     }
 
+    public String getWeekstamp() {
+        LocalDate now = LocalDate.now();
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekOfYear = now.get(weekFields.weekOfYear());
+        int year = now.getYear();
+        return String.format("%04d%02d", year, weekOfYear); // e.g. 202538
+    }
+
     public static String getDaystampBeforeXDays(int x) {
         LocalDate date = LocalDate.now().minusDays(x);
         int dayOfYear = date.getDayOfYear();
@@ -83,6 +93,14 @@ public class Commons {
         String dayOfYearStr = String.format("%03d", dayOfYear);
         String yearStr = String.format("%02d", year);
         return dayOfYearStr + yearStr;
+    }
+
+    public static String getWeekStampBeforeXWeeks(int x) {
+        LocalDate date = LocalDate.now().minusWeeks(x);
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekOfYear = date.get(weekFields.weekOfYear());
+        int year = date.getYear();
+        return String.format("%04d%02d", year, weekOfYear); // e.g. 202536
     }
 
     public static int getDaysDifferenceFromToday(String currentKey) {

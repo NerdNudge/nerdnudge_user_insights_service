@@ -1,18 +1,13 @@
 package com.neurospark.nerdnudge.userinsights.dto.insights;
 
-import com.neurospark.nerdnudge.userinsights.dto.insights.summaryInsights.OverallSummaryEntity;
-import com.neurospark.nerdnudge.userinsights.dto.insights.topicInsights.TopicSummaryEntity;
-import com.neurospark.nerdnudge.userinsights.dto.insights.trendInsights.TrendSummaryEntity;
+import com.neurospark.nerdnudge.userinsights.dto.insights.day.DayInsights;
+import com.neurospark.nerdnudge.userinsights.dto.insights.month.MonthInsights;
+import com.neurospark.nerdnudge.userinsights.dto.insights.week.WeekInsights;
 import lombok.Data;
-
-import java.util.Map;
 
 @Data
 public class UserInsightsEntity {
-    private OverallSummaryEntity overallSummary;
-    private TopicSummaryEntity topicSummary;
-    private TrendSummaryEntity trendSummary;
-    private Map<String, Integer[]> heatMap;
-    private Map<String, Integer> rankings;
-    private Map<String, Double> scores;
+    private DayInsights dayInsights;
+    private WeekInsights weekInsights;
+    private MonthInsights monthInsights;
 }

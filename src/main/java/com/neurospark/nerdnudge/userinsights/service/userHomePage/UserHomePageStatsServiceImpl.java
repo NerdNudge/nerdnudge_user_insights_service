@@ -71,21 +71,7 @@ public class UserHomePageStatsServiceImpl implements UserHomePageStatsService{
                 continue;
 
             JsonObject thisDayObject = last30DaysObject.get(dayStamp).getAsJsonObject();
-            JsonArray easyArray = thisDayObject.get("easy").getAsJsonArray();
-            JsonArray medArray = thisDayObject.get("medium").getAsJsonArray();
-            JsonArray hardArray = thisDayObject.get("hard").getAsJsonArray();
-
-            int totalQuestions = 0;
-            int totalCorrect = 0;
-            totalQuestions += easyArray.get(0).getAsInt();
-            totalQuestions += medArray.get(0).getAsInt();
-            totalQuestions += hardArray.get(0).getAsInt();
-
-            totalCorrect += easyArray.get(1).getAsInt();
-            totalCorrect += medArray.get(1).getAsInt();
-            totalCorrect += hardArray.get(1).getAsInt();
-
-            result.addProperty(dayStamp, Commons.getPercentage(totalQuestions, totalCorrect));
+            result.addProperty(dayStamp, Commons.getPercentage(thisDayObject.get("total").getAsInt(), thisDayObject.get("totalCorrect").getAsInt()));
         }
     }
 
