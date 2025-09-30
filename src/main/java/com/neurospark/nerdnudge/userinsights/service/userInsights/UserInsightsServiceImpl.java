@@ -80,50 +80,22 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         if(!topicwiseObject.has("overall"))
             return userTopicsStats;
 
-        JsonObject rwcObject = (userData.has("rwc") && ! userData.get("rwc").isJsonNull()) ? userData.get("rwc").getAsJsonObject() : new JsonObject();
         JsonObject overallObject = topicwiseObject.get("overall").getAsJsonObject();
         Iterator<Map.Entry<String, JsonElement>> topicsIterator = overallObject.entrySet().iterator();
         while(topicsIterator.hasNext()) {
             Map.Entry<String, JsonElement> thisEntry = topicsIterator.next();
             String topic = thisEntry.getKey();
-            JsonObject subtopicObject = thisEntry.getValue().getAsJsonObject();
-            if(! subtopicObject.has("correct"))
+            JsonObject topicObject = thisEntry.getValue().getAsJsonObject();
+            if(! topicObject.has("correct"))
                 continue;
 
-            JsonArray correctArray = subtopicObject.get("correct").getAsJsonArray();
-            double userTopicScore = getUserTopicScoreIndicator(correctArray.get(0).getAsInt(), correctArray.get(1).getAsInt());
-            long topicLastTaken = subtopicObject.get("lastTaken").getAsLong();
+            long topicLastTaken = topicObject.get("lastTaken").getAsLong();
+            int level = topicObject.has("level") ? topicObject.get("level").getAsInt() : 1;
 
-            JsonObject topicRWC = rwcObject.has(topic) ? rwcObject.get(topic).getAsJsonObject() : null;
-            userTopicsStats.put(topic, new UserTopicsStatsEntity(userTopicScore, lastTakenByUser(topicLastTaken), topicRWC));
+            userTopicsStats.put(topic, new UserTopicsStatsEntity(lastTakenByUser(topicLastTaken), level));
         }
 
         return userTopicsStats;
-    }
-
-    @Override
-    public Double getUserTopicScore(String userId, String topic) {
-        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
-        if(! userData.has("scores"))
-            return 0.0;
-
-        JsonObject scoresObject = userData.get("scores").getAsJsonObject();
-        double score = scoresObject.has(topic) ? scoresObject.get(topic).getAsDouble() : 0.0;
-        return Double.parseDouble(String.format("%.2f", score));
-    }
-
-    private double getUserTopicScoreIndicator(int numQuizflexes, int correct) {
-        int maxQuestions = 2400;
-        if (numQuizflexes == 0) {
-            return 0.0;
-        }
-
-        double baseScore = ((double) correct / numQuizflexes) * 100;
-
-        double weight = Math.log1p(numQuizflexes) / Math.log1p(maxQuestions);
-        weight = Math.min(1.0, weight);
-        double finalScore = baseScore * weight;
-        return Math.round(finalScore * 100.0) / 100.0;
     }
 
     private String lastTakenByUser(long epoch) {

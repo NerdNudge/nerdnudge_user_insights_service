@@ -55,16 +55,6 @@ public class UserInsightsController {
         return new ApiResponse<>(Constants.SUCCESS, "User topics stats fetched successfully", userTopicsStatsEntity, (endTime - startTime));
     }
 
-    @GetMapping("/getUserTopicScore/{id}/{topic}")
-    public ApiResponse<Double> getUserTopicScore(@PathVariable(value = "id") String userId, @PathVariable(value = "topic") String topic) {
-        long startTime = System.currentTimeMillis();
-        log.info("Get User Topic Score for user: {}, topic: {}", userId, topic);
-        Double userTopicScore = userInsightsService.getUserTopicScore(userId, topic);
-        long endTime = System.currentTimeMillis();
-        new Metric.MetricBuilder().setName("userTopicScoreFetch").setUnit(Metric.Unit.MILLISECONDS).setValue((endTime - startTime)).build();
-        return new ApiResponse<>(Constants.SUCCESS, "User topics score fetched successfully", userTopicScore, (endTime - startTime));
-    }
-
     @GetMapping("/health")
     public ApiResponse<String> healthCheck() {
         return new ApiResponse<>(Constants.SUCCESS, "Health Check Pass", Constants.SUCCESS, 0);
