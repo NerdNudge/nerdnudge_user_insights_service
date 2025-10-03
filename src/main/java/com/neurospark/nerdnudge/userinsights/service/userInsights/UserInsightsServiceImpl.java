@@ -98,6 +98,35 @@ public class UserInsightsServiceImpl implements UserInsightsService {
         return userTopicsStats;
     }
 
+    @Override
+    public Map<String, String> getUserSubtopicLevels(String topic, String userId) {
+        JsonObject userData = Commons.getUserProfileDocument(userId, userProfilesPersist);
+        Map<String, String> userSubtopicLevels = new HashMap<>();
+        if(! userData.has("topicwise"))
+            return userSubtopicLevels;
+
+        JsonObject topicwiseObject = userData.get("topicwise").getAsJsonObject();
+        if(!topicwiseObject.has("overall"))
+            return userSubtopicLevels;
+
+        JsonObject overallObject = topicwiseObject.get("overall").getAsJsonObject();
+        if(! overallObject.has(topic))
+            return userSubtopicLevels;
+
+        JsonObject thisTopicObject = overallObject.get(topic).getAsJsonObject();
+        if(! thisTopicObject.has("subtopicLevels"))
+            return userSubtopicLevels;
+
+        JsonObject subtopicUserLevelsObject = thisTopicObject.get("subtopicLevels").getAsJsonObject();
+        Iterator<Map.Entry<String, JsonElement>> userLevelsIterator = subtopicUserLevelsObject.entrySet().iterator();
+        while(userLevelsIterator.hasNext()) {
+            Map.Entry<String, JsonElement> thisSubtopicEntry = userLevelsIterator.next();
+            userSubtopicLevels.put(thisSubtopicEntry.getKey(), thisSubtopicEntry.getValue().getAsString());
+        }
+
+        return userSubtopicLevels;
+    }
+
     private String lastTakenByUser(long epoch) {
         long daysDifference = Commons.getDaysDifference(epoch);
         if(daysDifference == 0)

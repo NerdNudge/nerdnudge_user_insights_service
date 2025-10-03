@@ -9,4 +9,6 @@ public interface UserInsightsService {
     public UserInsightsEntity getUserInsights(String userId);
 
     public Map<String, UserTopicsStatsEntity> getUserTopicStats(String userId);
+
+    public Map<String, String> getUserSubtopicLevels(String topic, String userId);
 }

@@ -55,6 +55,16 @@ public class UserInsightsController {
         return new ApiResponse<>(Constants.SUCCESS, "User topics stats fetched successfully", userTopicsStatsEntity, (endTime - startTime));
     }
 
+    @GetMapping("/getUserSubtopicLevels/{topic}/{id}")
+    public ApiResponse<Map<String, String>> getUserSubtopicLevels(@PathVariable(value = "topic") String topic, @PathVariable(value = "id") String userId) {
+        long startTime = System.currentTimeMillis();
+        log.info("Get User Sub-topic levels: {} : {}", topic, userId);
+        Map<String, String> userSubtopicLevels = userInsightsService.getUserSubtopicLevels(topic, userId);
+        long endTime = System.currentTimeMillis();
+        new Metric.MetricBuilder().setName("userSubtopicLevelsFetch").setUnit(Metric.Unit.MILLISECONDS).setValue((endTime - startTime)).build();
+        return new ApiResponse<>(Constants.SUCCESS, "User sub-topic levels fetched successfully", userSubtopicLevels, (endTime - startTime));
+    }
+
     @GetMapping("/health")
     public ApiResponse<String> healthCheck() {
         return new ApiResponse<>(Constants.SUCCESS, "Health Check Pass", Constants.SUCCESS, 0);
